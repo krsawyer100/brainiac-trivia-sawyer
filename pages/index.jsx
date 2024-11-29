@@ -8,6 +8,89 @@ import styles from "../styles/Home.module.css";
 import Header from "../components/header";
 import useLogout from "../hooks/useLogout";
 
+const categories = {
+  ultimateTriviaChallenge: {
+    general: {
+      categoryId: 9
+    }
+  },
+  generalKnowledge: {
+    mythology: {
+      categoryId: 20
+    },
+    sports: {
+      categoryId: 21
+    },
+    geography: {
+      categoryId: 22
+    },
+    history: {
+      categoryId: 23
+    },
+    politics: {
+      categoryId: 24
+    },
+    art: {
+      categoryId: 25
+    },
+    celebrities: {
+      categoryId: 26
+    },
+    animals: {
+      categoryId: 27
+    },
+    vehicles: {
+      categoryId: 28
+    }
+  },
+  entertainment: {
+    books: {
+      categoryId: 10
+    },
+    film: {
+      categoryId: 11
+    },
+    music: {
+      categoryId: 12
+    },
+    musicals: {
+      categoryId: 13
+    },
+    television: {
+      categoryId: 14
+    },
+    videogames: {
+      categoryId: 15
+    },
+    boardgames: {
+      categoryId: 16
+    },
+    comics: {
+      categoryId: 29
+    },
+    anime: {
+      categoryId: 31
+    },
+    cartoons: {
+      categoryId: 32
+    }
+  },
+  science: {
+    sciences: {
+      categoryId: 17
+    },
+    computers: {
+      categoryId: 18
+    },
+    mathematics: {
+      categoryId: 19
+    },
+    gadgets: {
+      categoryId: 30
+    }
+  }
+}
+
 export const getServerSideProps = withIronSessionSsr(
   async function getServerSideProps({ req }) {
     const user = req.session.user;
@@ -26,6 +109,7 @@ export const getServerSideProps = withIronSessionSsr(
 export default function Home(props) {
   const router = useRouter();
   const logout = useLogout();
+
   return (
     <div className={styles.container}>
       <Head>
@@ -37,48 +121,45 @@ export default function Home(props) {
       <Header isLoggedIn={props.isLoggedIn} username={props?.user?.username} />
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Current Location: <code className={styles.code}>{router.asPath}</code>
-          <br />
-          Status:{" "}
-          <code className={styles.code}>
-            {!props.isLoggedIn && " Not"} Logged In
-          </code>
-        </p>
-
-        <div className={styles.grid}>
-          {props.isLoggedIn ? (
-            <>
-              <Link href="/dashboard" className={styles.card}>
-                <h2>Dashboard &rarr;</h2>
-                <p>This page is only visible if you are logged in.</p>
+        <h2>Ultimate Trivia Challenge</h2>
+        <div>
+          {Object.keys(categories.ultimateTriviaChallenge).map((category) => (
+            <button key={category.categoryId}>
+              <Link href={`/trivia/${category}`}>
+                Ultimate Trivia Challenge
               </Link>
-              <div
-                onClick={logout}
-                style={{ cursor: "pointer" }}
-                className={styles.card}
-              >
-                <h2>Logout &rarr;</h2>
-                <p>Click here to log out.</p>
-              </div>
-            </>
-          ) : (
-            <>
-              <Link href="/login" className={styles.card}>
-                <h2>Login &rarr;</h2>
-                <p>Visit the login page.</p>
+            </button>
+          ))}
+        </div>
+        <h2>General Knowledge</h2>
+        <div>
+          {Object.keys(categories.generalKnowledge).map((category) => (
+            <button key={category.categoryId}>
+              <Link href={`/trivia/${category}`}>
+                {category}
               </Link>
-
-              <Link href="/signup" className={styles.card}>
-                <h2>Create Account &rarr;</h2>
-                <p>Create an account.</p>
+            </button>
+          ))}
+        </div>
+        <h2>Entertainment</h2>
+        <div>
+          {Object.keys(categories.entertainment).map((category) => (
+            <button key={category.categoryId}>
+              <Link href={`/trivia/${category}`}>
+                {category}
               </Link>
-            </>
-          )}
+            </button>
+          ))}
+        </div>
+        <h2>Science</h2>
+        <div>
+          {Object.keys(categories.science).map((category) => (
+            <button key={category.categoryId}>
+              <Link href={`/trivia/${category}`}>
+                {category}
+              </Link>
+            </button>
+          ))}
         </div>
       </main>
 

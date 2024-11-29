@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "config": {
-    "DB_NAME": "mongo_project_db"
+    "DB_NAME": "brainiac_trivia_db"
   },
   "scripts": {
     "dev": "npm run mongo && next dev",
@@ -20,11 +20,12 @@
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
+    "html-react-parser": "^5.1.18",
     "iron-session": "^6.3.1",
+    "mongoose": "^7.0.0",
     "next": "13.0.0",
     "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "mongoose": "^7.0.0"
+    "react-dom": "18.2.0"
   },
   "devDependencies": {
     "eslint": "8.26.0",

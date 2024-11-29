@@ -38,7 +38,7 @@ export default function Signup(props) {
         },
         body: JSON.stringify({ username, password }),
       });
-      if (res.status === 200) return router.push("/dashboard");
+      if (res.status === 200) return router.push("/");
       const { error: message } = await res.json();
       setError(message);
     } catch (err) {

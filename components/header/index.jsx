@@ -9,7 +9,7 @@ export default function Header(props) {
       {props.isLoggedIn ? (
         <>
           <p>
-            <Link href="/">Home</Link>
+            <Link href="/">Brainiac Trivia</Link>
           </p>
           <div className={styles.container}>
             <p>Welcome, {props.username}!</p>
@@ -31,4 +31,3 @@ export default function Header(props) {
     </header>
   );
 }
-

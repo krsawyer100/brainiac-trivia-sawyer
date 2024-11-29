@@ -43,7 +43,7 @@ export default function Login(props) {
         },
         body: JSON.stringify({ username, password }),
       });
-      if (res.status === 200) return router.push("/dashboard");
+      if (res.status === 200) return router.push("/");
       const { error: message } = await res.json();
       setError(message);
     } catch (err) {
@@ -51,6 +51,7 @@ export default function Login(props) {
     }
   }
   return (
+    
     <div className={styles.container}>
       <Head>
         <title>Create Next App</title>
