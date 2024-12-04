@@ -1,26 +1,41 @@
+:root {
+  --white: #fafafa;
+  --primary: #028090;
+  --secondary: #9c3848;
+  --black: #0b0a09;
+  --error: #9d0208;
+}
+
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  min-height: 100vh;
+  font-size: 12px;
+  font-family: "Ubuntu Sans", sans-serif;
+  background-color: var(--white);
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+h1 {
+  font-weight: 700;
+  font-size: 2.5rem;
 }
 
-* {
-  box-sizing: border-box;
+h2 {
+  font-weight: 600;
+  font-size: 2rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  body {
-    color: white;
-    background: black;
-  }
+h3 {
+  font-weight: 500;
+  font-size: 1.5rem;
+}
+
+h4 {
+  font-weight: 400;
+  font-size: 1.25rem;
+}
+
+p {
+  font-weight: 300;
 }

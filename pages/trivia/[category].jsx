@@ -5,11 +5,13 @@ import { set } from 'mongoose'
 import parse from 'html-react-parser'
 import sessionOptions from "../../config/session";
 import { withIronSessionSsr } from "iron-session/next";
+import Header from "../../components/header";
+import Footer from "../../components/footer";
+import styles from "../../styles/Trivia.module.css";
 
 const API_URL = `https://opentdb.com/api.php?amount=10&type=multiple`
 
 const categoryNums = {
-    trivia: 9,
     books: 10,
     film: 11,
     music: 12,
@@ -67,6 +69,7 @@ async function getServerSideProps(context) {
         props.isLoggedIn = true;
     } else {
         props.isLoggedIn = false;
+        props.user = null
     }
 
     return { props }
@@ -75,8 +78,10 @@ async function getServerSideProps(context) {
 
 export default function Trivia(props) {
     const router = useRouter()
-    const { category } = router.query
+    const { category } = router.query;
     const userId = props.user._id
+    const isLoggedIn = props.isLoggedIn
+    console.log(userId)
     const [questions, setQuestions] = useState(props.questions)
     const [questionNum, setQuestionNum] = useState(0)
     const [gameRunning, setGameRunning] = useState(false)
@@ -105,7 +110,7 @@ export default function Trivia(props) {
             setGameRunning(false)
             const finalScore = convertScore(score + (isCorrect ? 1 : 0))
 
-            if (props.isLoggedIn) {
+            if (isLoggedIn) {
                 addScore(category, finalScore, userId)
             } else {
                 console.log("user is not logged in")
@@ -119,6 +124,11 @@ export default function Trivia(props) {
     }
 
     async function addScore(category, score, userId) {
+        if(!isLoggedIn) {
+            console.log('user not logged in - cannot save score')
+            return
+        }
+
         try {
             const res = await fetch("/api/score/addScore", {
                 method: "POST",
@@ -161,21 +171,23 @@ export default function Trivia(props) {
     }
 
     useEffect(() => {
-        async function fetchHighScore() {
-            try {
-                const res = await fetch(`/api/score/getHighScore?category=${category}&userId=${userId}`)
-                if (res.status === 200) {
-                    const data = await res.json()
-                    setHighScore(data?.highScore || 0)
-                } else {
-                    console.log("error getting highscore")
+        if (isLoggedIn) {
+            async function fetchHighScore() {
+                try {
+                    const res = await fetch(`/api/score/getHighScore?category=${category}&userId=${userId}`)
+                    if (res.status === 200) {
+                        const data = await res.json()
+                        setHighScore(data?.highScore || 0)
+                    } else {
+                        console.log("error getting highscore")
+                    }
+                } catch (err) {
+                    console.log(err.message)
                 }
-            } catch (err) {
-                console.log(err.message)
             }
+            fetchHighScore()
         }
-        fetchHighScore()
-    }, [category, userId])
+    }, [category, isLoggedIn, userId])
 
     useEffect(() => {
         if (score > highScore) {
@@ -185,9 +197,16 @@ export default function Trivia(props) {
 
     return (
         <>
-            <h2>Test your {category.charAt(0).toUpperCase() + category.slice(1)} Knowledge</h2>
+        <Header isLoggedIn={isLoggedIn} username={props?.user?.username} />
+        <main className={styles.main}>
             {!gameRunning && questionNum === 0 && (
+                <>
+                <h2>Test your {category.charAt(0).toUpperCase() + category.slice(1)} Knowledge</h2>
+                {!isLoggedIn && 
+                <p>Note: High scores are not saved if you are not logged in.</p>
+                }
                 <button onClick={handleStartGame}>Start Game</button>
+                </>
             )}
             {gameRunning && (
                 <>
@@ -208,14 +227,21 @@ export default function Trivia(props) {
             {!gameRunning && questionNum > 0 && (
                 <>
                     <h3>Game Over! Your Score: {convertScore(score)}%</h3>
+                    {isLoggedIn &&
+                    <>
                     <button onClick={handleDeleteScore}>Delete Score</button>
-                    <h4>Highscore: {highScore}%</h4>
+                     <h4>Highscore: {highScore}%</h4>
+                     </>
+                     }
+                    
                     <div>
                         <button onClick={handleStartGame}>Play Again</button>
                         <button onClick={handleExploreCategories}>Explore Other Categories</button>
                     </div>
                 </>
             )}
+            </main>
+        <Footer />
         </>
     )
 }

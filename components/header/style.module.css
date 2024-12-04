@@ -1,5 +1,19 @@
-.container {
+.headerContainer {
+  background-color: var(--white);
+  border-bottom: var(--primary) 2px solid;
+}
+
+.headerInfo {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  align-items: center;
+  gap: 20px;
+  padding: 5px 10px;
+}
+
+.headerInfo > p, .headerInfoLink {
+  font-size: 1.25rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--primary);
 }

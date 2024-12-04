@@ -1,145 +1,132 @@
-.container {
-  padding: 0 2rem;
-}
-
 .main {
   min-height: 100vh;
-  padding: 4rem 0;
-  flex: 1;
+}
+
+.heroContainer {
+  background-image: url("../public/images/hero-img.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  height: 500px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
 }
 
-.footer {
+.heroText {
+  background-color: var(--primary);
+  color: var(--white);
   display: flex;
-  flex: 1;
-  padding: 2rem 0;
-  border-top: 1px solid #eaeaea;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+}
+
+.heroText > h1 {
+  margin-bottom: 5px;
+}
+
+.highScores {
+    background-color: var(--secondary);
+    padding: 20px 30px 50px;
+}
+.highScores > h2 {
+  color: var(--white);
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.highScoresContainer {
+  display: flex;
   justify-content: center;
   align-items: center;
+  color: var(--black);
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
-.footer a {
+.highScore {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  flex-grow: 1;
+  justify-content: center;
+  border: var(--white) solid 2px;
+  background-color: var(--white);
+  border-radius: 10px;  
+  padding: 0 10px 20px;
+  width: 150px;
 }
 
-.title a {
-  color: #0070f3;
-  text-decoration: none;
+.highScore > h3 {
+  margin-bottom: 3px;
+  padding-bottom: 15px;
+  border-bottom: var(--primary) solid 2px;
+  width: 100%;
+  text-align: center;
+  color: var(--primary);
 }
 
-.title a:hover,
-.title a:focus,
-.title a:active {
-  text-decoration: underline;
+.highScore > button {
+  background-color: var(--primary);
+  border: none;
+  font-family: "Ubuntu Sans", sans-serif;
+  font-weight: 400;
+  padding: 5px 10px;
+  border-radius: 8px;
+  color: var(--white);
+  margin-top: 2px;
 }
 
-.title {
-  margin: 0;
-  line-height: 1.15;
-  font-size: 4rem;
-}
-
-.title,
-.description {
+.categoriesContainer {
+  margin: 20px 30px;
+  display: flex;
+  flex-direction: column;
   text-align: center;
 }
 
-.description {
-  margin: 4rem 0;
-  line-height: 1.5;
-  font-size: 1.5rem;
+.categoriesContainer > h2 {
+  color: var(--secondary);
 }
 
-.code {
-  background: #fafafa;
-  border-radius: 5px;
-  padding: 0.75rem;
-  font-size: 1.1rem;
-  font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
-    Bitstream Vera Sans Mono, Courier New, monospace;
-}
-
-.grid {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  max-width: 800px;
-}
-
-.card {
-  margin: 1rem;
-  padding: 1.5rem;
-  text-align: left;
-  color: inherit;
-  text-decoration: none;
-  border: 1px solid #eaeaea;
-  border-radius: 10px;
-  transition: color 0.15s ease, border-color 0.15s ease;
-  max-width: 350px;
-}
-
-.form {
+.categories {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  text-align: center;
+  gap: 20px;
 }
 
-.form > * {
-  margin-bottom: 10px;
+.categories > h3 {
+  margin-top: 20px;
+  margin-bottom: 5px;
 }
 
-.form > button {
-  cursor: pointer;
-  transition: 0.15s ease;
-}
-.form>button:is(:hover, :focus, :active) {
-  color: #fafafa;
-  background-color: #222;
-}
-
-.card:is(:hover, :focus, :active) {
-  color: #0070f3;
-  border-color: #0070f3;
+.category {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
-.card h2 {
-  margin: 0 0 1rem 0;
-  font-size: 1.5rem;
+.categoryInfo {
+  display: flex;
+  flex-direction: column;
+  height: 300px;
+  width: 200px;
+  border: var(--primary) 2px solid;
+  border-radius: 10px;
+  text-align: center;
+  text-decoration: none;
 }
 
-.card p {
-  margin: 0;
-  font-size: 1.25rem;
-  line-height: 1.5;
+.categoryInfo > img {
+  border-radius: 7px 7px 0 0;
 }
 
-.logo {
-  height: 1em;
-  margin-left: 0.5rem;
+.categoryInfo > h4 {
+  margin-bottom: 3px;
+  color: var(--primary);
 }
 
-@media (max-width: 600px) {
-  .grid {
-    width: 100%;
-    flex-direction: column;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .card,
-  .footer {
-    border-color: #222;
-  }
-  .code {
-    background: #111;
-  }
-  .logo img {
-    filter: invert(1);
-  }
+.categoryInfo > p {
+  color: var(--black);
 }
