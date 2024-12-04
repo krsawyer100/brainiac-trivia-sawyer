@@ -90,9 +90,8 @@ const categories = {
 
 export const getServerSideProps = withIronSessionSsr(
   async function getServerSideProps({ req }) {
-    const user = req.session.user;
     const props = {};
-    if (user) {
+    if (req.session.user) {
       props.user = req.session.user;
       props.isLoggedIn = true;
     } else {

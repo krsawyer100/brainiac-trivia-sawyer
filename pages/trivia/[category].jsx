@@ -40,7 +40,6 @@ const categoryNums = {
 export const getServerSideProps = withIronSessionSsr(
 async function getServerSideProps(context) {
     const { category } = context.params
-    const user = context.req.session.user
     const categoryId = categoryNums[category]
     const props = {}
 
@@ -64,8 +63,8 @@ async function getServerSideProps(context) {
         correctAnswer: item.correct_answer
     }))
 
-    if (user) {
-        props.user = user;
+    if (context.req.session.user) {
+        props.user = context.req.session.user;
         props.isLoggedIn = true;
     } else {
         props.isLoggedIn = false;
@@ -79,7 +78,7 @@ async function getServerSideProps(context) {
 export default function Trivia(props) {
     const router = useRouter()
     const { category } = router.query;
-    const userId = props.user._id
+    const userId = props.user ? props.user._id : null
     const isLoggedIn = props.isLoggedIn
     console.log(userId)
     const [questions, setQuestions] = useState(props.questions)
@@ -171,7 +170,7 @@ export default function Trivia(props) {
     }
 
     useEffect(() => {
-        if (isLoggedIn) {
+        if (isLoggedIn && userId) {
             async function fetchHighScore() {
                 try {
                     const res = await fetch(`/api/score/getHighScore?category=${category}&userId=${userId}`)
@@ -201,43 +200,50 @@ export default function Trivia(props) {
         <main className={styles.main}>
             {!gameRunning && questionNum === 0 && (
                 <>
-                <h2>Test your {category.charAt(0).toUpperCase() + category.slice(1)} Knowledge</h2>
-                {!isLoggedIn && 
-                <p>Note: High scores are not saved if you are not logged in.</p>
-                }
-                <button onClick={handleStartGame}>Start Game</button>
+                <div className={styles.startGame}>
+                    <h2>Test your {category.charAt(0).toUpperCase() + category.slice(1)} Knowledge</h2>
+                    {!isLoggedIn && 
+                    <h4>Note: High scores are not saved if you are not logged in.</h4>
+                    }
+                    <button onClick={handleStartGame}>Start Game</button>
+                </div>
                 </>
             )}
             {gameRunning && (
                 <>
-                <h3>Question {questionNum + 1} of {questions.length}</h3>
-                <h4>{parse(questions[questionNum].question)}</h4>
-                <div>
-                    {questions[questionNum].answerChoices.map((choice, i) => (
-                        <>
-                            <button key={i} onClick={() => handleAnswerSelection(choice)}>
-                                {parse(choice)}
-                            </button>
-                        </>
-                    ))}
+                <div className={styles.gameContainer}>
+                    <h3>{parse(questions[questionNum].question)}</h3>
+                    <div className={styles.answersContainer}>
+                        {questions[questionNum].answerChoices.map((choice, i) => (
+                            <>
+                                <button key={i} onClick={() => handleAnswerSelection(choice)}>
+                                    {parse(choice)}
+                                </button>
+                            </>
+                        ))}
+                    </div>
+                    <p>Question {questionNum + 1} of {questions.length}</p>
                 </div>
                 </>
             )}
 
             {!gameRunning && questionNum > 0 && (
-                <>
-                    <h3>Game Over! Your Score: {convertScore(score)}%</h3>
-                    {isLoggedIn &&
-                    <>
-                    <button onClick={handleDeleteScore}>Delete Score</button>
-                     <h4>Highscore: {highScore}%</h4>
-                     </>
-                     }
-                    
-                    <div>
+                <>  
+                    <div className={styles.endGame}>
+                    <h2>Game Over! Your Score: {convertScore(score)}%</h2>
+                    <div className={styles.endGameButtons}>
                         <button onClick={handleStartGame}>Play Again</button>
                         <button onClick={handleExploreCategories}>Explore Other Categories</button>
                     </div>
+                    <div className={styles.endGameHighScore}>
+                    {isLoggedIn &&
+                    <>
+                     <h3>Highscore: {highScore}%</h3>
+                     <button onClick={handleDeleteScore}>Delete Score</button>
+                     </>
+                     }
+                </div>
+                </div>
                 </>
             )}
             </main>

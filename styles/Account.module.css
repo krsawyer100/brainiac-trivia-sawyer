@@ -1,0 +1,45 @@
+.main {
+    min-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.formContainer > h1 {
+    color: var(--secondary);
+    text-align: center;
+}
+
+.formContainer {
+    border: var(--secondary) 2px solid;
+    border-radius: 10px;
+    padding: 50px 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.form > label {
+    font-size: 1.15rem;
+    margin-bottom: 5px;
+    margin-top: 15px;
+}
+
+.form > button {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.link {
+    font-size: 1.25rem;
+    color: var(--primary);
+    text-decoration: underline var(--primary) 1px;
+}

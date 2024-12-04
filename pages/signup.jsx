@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import styles from "../styles/Account.module.css";
 import { useRouter } from "next/router";
+import Header from "../components/header";
+import Footer from "../components/footer";
 
 export default function Signup(props) {
   const router = useRouter();
@@ -53,22 +55,16 @@ export default function Signup(props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <Header isLoggedIn={props.isLoggedIn} username={props?.user?.username} />
+
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to the <a href="https://nextjs.org">Next.js</a> Login Page!
+      <div className={styles.formContainer}>
+        <h1>
+        Create a Brainiac Trivia Account!
         </h1>
 
-        <p className={styles.description}>
-          Current Location: <code className={styles.code}>{router.asPath}</code>
-          <br />
-          Status:{" "}
-          <code className={styles.code}>
-            {!props.isLoggedIn && " Not"} Logged In
-          </code>
-        </p>
-
         <form
-          className={[styles.card, styles.form].join(" ")}
+          className={styles.form}
           onSubmit={handleCreateAccount}
         >
           <label htmlFor="username">Username: </label>
@@ -99,22 +95,11 @@ export default function Signup(props) {
           {error && <p>{error}</p>}
         </form>
         <Link href="/login">
-          <p>Login instead?</p>
+          <p className={styles.link}>Login instead?</p>
         </Link>
+        </div>
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{" "}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+      <Footer />
     </div>
   );
 }
