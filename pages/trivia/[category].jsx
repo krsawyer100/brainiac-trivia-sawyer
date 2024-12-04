@@ -1,13 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { set } from 'mongoose'
 import parse from 'html-react-parser'
+import sessionOptions from "../../config/session";
+import { withIronSessionSsr } from "iron-session/next";
 
 const API_URL = `https://opentdb.com/api.php?amount=10&type=multiple`
 
 const categoryNums = {
-    general: 9,
+    trivia: 9,
     books: 10,
     film: 11,
     music: 12,
@@ -33,8 +35,10 @@ const categoryNums = {
     cartoons: 32 
 }
 
-export async function getServerSideProps(req) {
-    const { category } = req.params
+export const getServerSideProps = withIronSessionSsr(
+async function getServerSideProps(context) {
+    const { category } = context.params
+    const user = context.req.session.user
     const categoryId = categoryNums[category]
     const props = {}
 
@@ -58,30 +62,34 @@ export async function getServerSideProps(req) {
         correctAnswer: item.correct_answer
     }))
 
+    if (user) {
+        props.user = user;
+        props.isLoggedIn = true;
+    } else {
+        props.isLoggedIn = false;
+    }
+
     return { props }
 
-}
+}, sessionOptions)
 
 export default function Trivia(props) {
     const router = useRouter()
     const { category } = router.query
-    console.log(props.questions)
+    const userId = props.user._id
     const [questions, setQuestions] = useState(props.questions)
     const [questionNum, setQuestionNum] = useState(0)
-    const { question, choices } = questions[questionNum]
     const [gameRunning, setGameRunning] = useState(false)
     const [score, setScore] = useState(0)
-    const [result, setResult] = useState({
-        score: 0,
-        correctAnswers: 0,
-        wrongAnswers: 0
-    })
+    const [highScore, setHighScore] = useState(null)
     const [timeLeft, setTimeLeft] = useState(30)
 
     function handleStartGame() {
         if (!gameRunning) {
             setGameRunning(true)
-            return gameRunning
+            setQuestionNum(0)
+            setScore(0)
+            return
         } else return
     }
 
@@ -94,15 +102,15 @@ export default function Trivia(props) {
         if (questionNum < questions.length - 1) {
             setQuestionNum((prev) => prev + 1)
         } else {
-            handleEndGame()
-        }
-    }
-
-    function handleEndGame() {
-        if (gameRunning) {
             setGameRunning(false)
-            return gameRunning
-        } else return
+            const finalScore = convertScore(score + (isCorrect ? 1 : 0))
+
+            if (props.isLoggedIn) {
+                addScore(category, finalScore, userId)
+            } else {
+                console.log("user is not logged in")
+            }
+        }
     }
 
     function convertScore(score) {
@@ -110,14 +118,75 @@ export default function Trivia(props) {
         return percentageScore
     }
 
+    async function addScore(category, score, userId) {
+        try {
+            const res = await fetch("/api/score/addScore", {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json",
+                },
+                body: JSON.stringify({ category, score, userId }),
+            })
+            if (res.status === 200) {
+                setHighScore(score)
+                return
+            }
+        } catch (err) {
+            console.log(err.message)
+        }
+    }
+
+    async function handleDeleteScore() {
+        try {
+            const res = await fetch("/api/score/removeScore", {
+                method: "DELETE",
+                headers: {
+                    "content-type": "application/json",
+                },
+                body: JSON.stringify({ category, userId }),
+            })
+            if (res.status === 200) {
+                setHighScore("--")
+                console.log('Score deleted successfully')
+            } else {
+                console.error('Error deleting score')
+            }
+        } catch (err) {
+            console.log(err.message)
+        }
+    }
+
+    function handleExploreCategories() {
+        router.push('/')
+    }
+
     useEffect(() => {
-        console.log("game running: ", gameRunning)
-    }, [gameRunning])
+        async function fetchHighScore() {
+            try {
+                const res = await fetch(`/api/score/getHighScore?category=${category}&userId=${userId}`)
+                if (res.status === 200) {
+                    const data = await res.json()
+                    setHighScore(data?.highScore || 0)
+                } else {
+                    console.log("error getting highscore")
+                }
+            } catch (err) {
+                console.log(err.message)
+            }
+        }
+        fetchHighScore()
+    }, [category, userId])
+
+    useEffect(() => {
+        if (score > highScore) {
+            setHighScore(score)
+        }
+    }, [score, highScore])
 
     return (
         <>
             <h2>Test your {category.charAt(0).toUpperCase() + category.slice(1)} Knowledge</h2>
-            {!gameRunning && (
+            {!gameRunning && questionNum === 0 && (
                 <button onClick={handleStartGame}>Start Game</button>
             )}
             {gameRunning && (
@@ -137,23 +206,16 @@ export default function Trivia(props) {
             )}
 
             {!gameRunning && questionNum > 0 && (
-                <div>
+                <>
                     <h3>Game Over! Your Score: {convertScore(score)}%</h3>
-                </div>
-            )}
-
-            {/* <div>
-                {props.questions.map((q, index) => (
-                    <div key={index}>
-                        <h3>{q.question}</h3>
-                        <div>
-                            {q.answerChoices.map((choice, i) => (
-                                <button key={i}>{choice}</button>
-                            ))}
-                        </div>
+                    <button onClick={handleDeleteScore}>Delete Score</button>
+                    <h4>Highscore: {highScore}%</h4>
+                    <div>
+                        <button onClick={handleStartGame}>Play Again</button>
+                        <button onClick={handleExploreCategories}>Explore Other Categories</button>
                     </div>
-                ))}
-            </div> */}
+                </>
+            )}
         </>
     )
 }

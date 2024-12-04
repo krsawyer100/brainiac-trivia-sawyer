@@ -7,10 +7,11 @@ import sessionOptions from "../config/session";
 import styles from "../styles/Home.module.css";
 import Header from "../components/header";
 import useLogout from "../hooks/useLogout";
+import { useState, useEffect } from 'react'
 
 const categories = {
   ultimateTriviaChallenge: {
-    general: {
+    trivia: {
       categoryId: 9
     }
   },
@@ -109,6 +110,49 @@ export const getServerSideProps = withIronSessionSsr(
 export default function Home(props) {
   const router = useRouter();
   const logout = useLogout();
+  const isLoggedIn = props.isLoggedIn
+  const user = props.user
+  const userId = user._id
+  console.log("USERID:", userId)
+  const [scores, setScores] = useState([])
+
+  useEffect(() => {
+    async function fetchHighScores() {
+      try {
+          const res = await fetch(`/api/score/getAllScores?userId=${userId}`)
+          if (res.status === 200) {
+              const data = await res.json()
+              setScores(data)
+          } else {
+              console.log("error getting highscores")
+          }
+      } catch (err) {
+          console.log(err.message)
+      }
+    }
+    fetchHighScores()
+  }, [isLoggedIn, userId, scores])
+
+  async function handleDeleteScore(e) {
+    const category = e.target.value
+    console.log(category)
+    try {
+        const res = await fetch("/api/score/removeScore", {
+            method: "DELETE",
+            headers: {
+                "content-type": "application/json",
+            },
+            body: JSON.stringify({ category, userId }),
+        })
+        if (res.status === 200) {
+            console.log('Score deleted successfully')
+        } else {
+            console.error('Error deleting score')
+        }
+    } catch (err) {
+        console.log(err.message)
+    }
+}
 
   return (
     <div className={styles.container}>
@@ -121,6 +165,23 @@ export default function Home(props) {
       <Header isLoggedIn={props.isLoggedIn} username={props?.user?.username} />
 
       <main className={styles.main}>
+      {isLoggedIn && (
+        <section>
+          <h2>{user.username}&apos;s High Scores</h2>
+          <div>
+            {scores.map((score) => (
+              <>
+                <div key={score.category}>
+                  <h4>{score.category.charAt(0).toUpperCase() + score.category.slice(1)}</h4>
+                  <p>High Score: {score.highScore}</p>
+                  <button onClick={handleDeleteScore} value={score.category}>Delete Score</button>
+                </div>
+              </>
+            ))}
+          </div>
+        </section>
+      )}
+        <h1>Categories</h1>
         <h2>Ultimate Trivia Challenge</h2>
         <div>
           {Object.keys(categories.ultimateTriviaChallenge).map((category) => (
@@ -136,7 +197,7 @@ export default function Home(props) {
           {Object.keys(categories.generalKnowledge).map((category) => (
             <button key={category.categoryId}>
               <Link href={`/trivia/${category}`}>
-                {category}
+                {category.charAt(0).toUpperCase() + category.slice(1)}
               </Link>
             </button>
           ))}
@@ -146,7 +207,7 @@ export default function Home(props) {
           {Object.keys(categories.entertainment).map((category) => (
             <button key={category.categoryId}>
               <Link href={`/trivia/${category}`}>
-                {category}
+                {category.charAt(0).toUpperCase() + category.slice(1)}
               </Link>
             </button>
           ))}
@@ -156,7 +217,7 @@ export default function Home(props) {
           {Object.keys(categories.science).map((category) => (
             <button key={category.categoryId}>
               <Link href={`/trivia/${category}`}>
-                {category}
+                {category.charAt(0).toUpperCase() + category.slice(1)}
               </Link>
             </button>
           ))}

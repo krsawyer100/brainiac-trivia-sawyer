@@ -3,6 +3,8 @@ import { Schema } from 'mongoose'
 const ScoreSchema = new Schema({
   category: {
     type: String,
+    required: true,
+    index: true
   },
   highScore: {
     type: Number,
@@ -10,5 +12,4 @@ const ScoreSchema = new Schema({
   }
 })
 
-// export default models.Score || model('Score', ScoreSchema)
 export default ScoreSchema
