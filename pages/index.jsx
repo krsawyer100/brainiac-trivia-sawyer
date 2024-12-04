@@ -112,13 +112,13 @@ export default function Home(props) {
   const logout = useLogout();
   const isLoggedIn = props.isLoggedIn
   const user = props.user
-  const userId = user._id
-  console.log("USERID:", userId)
   const [scores, setScores] = useState([])
 
   useEffect(() => {
     async function fetchHighScores() {
       try {
+        if (isLoggedIn && user) {
+          const userId = user._id
           const res = await fetch(`/api/score/getAllScores?userId=${userId}`)
           if (res.status === 200) {
               const data = await res.json()
@@ -126,12 +126,13 @@ export default function Home(props) {
           } else {
               console.log("error getting highscores")
           }
+        }
       } catch (err) {
           console.log(err.message)
       }
     }
     fetchHighScores()
-  }, [isLoggedIn, userId, scores])
+  }, [isLoggedIn, user, scores])
 
   async function handleDeleteScore(e) {
     const category = e.target.value
@@ -169,15 +170,19 @@ export default function Home(props) {
         <section>
           <h2>{user.username}&apos;s High Scores</h2>
           <div>
-            {scores.map((score) => (
-              <>
-                <div key={score.category}>
-                  <h4>{score.category.charAt(0).toUpperCase() + score.category.slice(1)}</h4>
-                  <p>High Score: {score.highScore}</p>
-                  <button onClick={handleDeleteScore} value={score.category}>Delete Score</button>
-                </div>
-              </>
-            ))}
+            {Array.isArray(scores) && scores.length > 0 ? (
+              scores.map((score) => (
+                <>
+                  <div key={score.category}>
+                    <h4>{score.category.charAt(0).toUpperCase() + score.category.slice(1)}</h4>
+                    <p>High Score: {score.highScore}</p>
+                    <button onClick={handleDeleteScore} value={score.category}>Delete Score</button>
+                  </div>
+                </>
+              ))
+            ) : (
+              <p>No High Scores Available</p>
+            )}
           </div>
         </section>
       )}
