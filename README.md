@@ -1,5 +1,7 @@
 # Brainiac Trivia Game
 
+**Application Link:** https://vercel.com/kylee-sawyers-projects/brainiac-trivia-sawyer/6kxwujkUn6JaW6vDtkXDSdmojsdz
+
 ## Project Description
 
 The Brainiac Trivia Game is a web application that has multiple categories to choose from in order to play different trivia quizzes. This project was initially create as a school coding assignment where I had to develop a React Web Application with the following parameters: use a datebase solution, link two types of data together, perform CRUD operations with data, and use NextJS API routes. I decided to create a trivia game due to my personal love for trivia quizzes but found many trivia games to be too overwhelming visually for me to enjoy.
@@ -40,7 +42,7 @@ The Brainiac Trivia Game is a web application that has multiple categories to ch
 ## Environmental Variables Required:
 
 1. IRON_PASS
-2. MONGODB_URL
+2. MONGODB_URI
 
 ## Future Project Implementations
 
