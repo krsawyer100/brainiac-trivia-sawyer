@@ -1,6 +1,6 @@
 # Brainiac Trivia Game
 
-**Application Link:** https://vercel.com/kylee-sawyers-projects/brainiac-trivia-sawyer/6kxwujkUn6JaW6vDtkXDSdmojsdz
+**Application Link:** https://brainiac-trivia-sawyer-i4eoyspmu-kylee-sawyers-projects.vercel.app/
 
 ## Project Description
 
