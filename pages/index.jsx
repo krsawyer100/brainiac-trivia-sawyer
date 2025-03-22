@@ -13,77 +13,146 @@ import Footer from "../components/footer";
 const categories = {
   generalKnowledge: {
     mythology: {
-      categoryId: 20
+      title: 'Mythology',
+      categoryId: 20,
+      img: '/images/mythology.jpg',
+      description: 'Explore the ancient myths, gods, and legends from cultures around the world.',
     },
     sports: {
-      categoryId: 21
+      title: 'Sports',
+      categoryId: 21,
+      img: '/images/sports.jpg',
+      description: 'Test your knowledge on everything from the Olympics to your favorite team sports.',
     },
     geography: {
-      categoryId: 22
+      title: 'Geography',
+      categoryId: 22,
+      img: '/images/geography.jpg',
+      description: 'From capitals to continents—how well do you know the world around you?',
     },
     history: {
-      categoryId: 23
+      title: 'History',
+      categoryId: 23,
+      img: '/images/history.jpg',
+      description: 'Delve into the events, people, and moments that shaped our past.',
     },
     politics: {
-      categoryId: 24
+      title: 'Politics',
+      categoryId: 24,
+      img: '/images/politics.jpg',
+      description: 'Answer questions about political systems, leaders, and world affairs.',
     },
     art: {
-      categoryId: 25
+      title: 'Art',
+      categoryId: 25,
+      img: '/images/art.jpg',
+      description: 'From classic masterpieces to modern art, discover the beauty of creativity.',
     },
     celebrities: {
-      categoryId: 26
+      title: 'Celebrities',
+      categoryId: 26,
+      img: '/images/celebrities.jpg',
+      description: 'How well do you know the stars of music, film, and pop culture?',
     },
     animals: {
-      categoryId: 27
+      title: 'Animals',
+      categoryId: 27,
+      img: '/images/animals.jpg',
+      description: 'Test your knowledge of the animal kingdom—furry, feathered, or scaly!',
     },
     vehicles: {
-      categoryId: 28
+      title: 'Vehicles',
+      categoryId: 28,
+      img: '/images/vehicles.jpg',
+      description: 'Cars, planes, and beyond—explore the world of machines in motion.',
     }
   },
   entertainment: {
     books: {
-      categoryId: 10
+      title: 'Books',
+      categoryId: 10,
+      img: '/images/books.jpg',
+      description: 'From classic literature to modern bestsellers—how well-read are you?',
     },
     film: {
-      categoryId: 11
+      title: 'Film',
+      categoryId: 11,
+      img: '/images/film.jpg',
+      description: 'Cinematic trivia from Hollywood hits to indie gems.',
     },
     music: {
-      categoryId: 12
+      title: 'Music',
+      categoryId: 12,
+      img: '/images/music.jpg',
+      description: 'Genres, artists, lyrics—everything that makes music magical.',
     },
     musicals: {
-      categoryId: 13
+      title: 'Musicals',
+      categoryId: 13,
+      img: '/images/musicals.jpg',
+      description: 'Broadway, West End, and beyond—sing your way through musical trivia.',
     },
     television: {
-      categoryId: 14
+      title: 'Television',
+      categoryId: 14,
+      img: '/images/television.jpg',
+      description: 'From binge-worthy dramas to classic sitcoms, test your TV IQ.',
     },
     videogames: {
-      categoryId: 15
+      title: 'Video Games',
+      categoryId: 15,
+      img: '/images/videogames.jpg',
+      description: 'From retro arcades to modern consoles—how much do you know about gaming?',
     },
     boardgames: {
-      categoryId: 16
+      title: 'Board Games',
+      categoryId: 16,
+      img: '/images/boardgames.jpg',
+      description: 'Strategy, luck, and trivia on classic and modern tabletop games.',
     },
     comics: {
-      categoryId: 29
+      title: 'Comics',
+      categoryId: 29,
+      img: '/images/comics.jpg',
+      description: 'Dive into the world of superheroes, villains, and iconic comic book stories.',
     },
     anime: {
-      categoryId: 31
+      title: 'Anime',
+      categoryId: 31,
+      img: '/images/anime.jpg',
+      description: 'Test your knowledge of Japanese animation—from classics to the latest hits.',
     },
     cartoons: {
-      categoryId: 32
+      title: 'Cartoons',
+      categoryId: 32,
+      img: '/images/cartoons.jpg',
+      description: 'From Saturday mornings to streaming favorites—animated fun awaits.',
     }
   },
   science: {
     sciences: {
-      categoryId: 17
+      title: 'Sciences',
+      categoryId: 17,
+      img: '/images/sciences.jpg',
+      description: 'General science questions spanning biology, chemistry, physics, and more.',
     },
     computers: {
-      categoryId: 18
+      title: 'Computers',
+      categoryId: 18,
+      img: '/images/computers.jpg',
+      description: 'Explore the digital world—from hardware to the internet.',
     },
     mathematics: {
-      categoryId: 19
+      title: 'Mathematics',
+      categoryId: 19,
+      img: '/images/mathematics.jpg',
+      description: 'Equations, logic, numbers—challenge your math brain!',
     },
     gadgets: {
-      categoryId: 30
+      title: 'Gadgets',
+      categoryId: 30,
+      img: '/images/gadgets.jpg',
+      description: 'Test your knowledge of cool tech, tools, and everyday innovations.',
     }
   }
 }
@@ -108,6 +177,7 @@ export default function Home(props) {
   const isLoggedIn = props.isLoggedIn
   const user = props.user
   const [scores, setScores] = useState([])
+  const [activeCategory, setActiveCategory] = useState("generalKnowledge")
 
   useEffect(() => {
     async function fetchHighScores() {
@@ -185,55 +255,95 @@ export default function Home(props) {
                 </>
               ))
             ) : (
-              <p>No High Scores Available</p>
+              <h4 className={styles.noScores}>No High Scores Available!</h4>
             )}
           </div>
         </section>
       )}
       <section className={styles.categoriesContainer}>
-      <h2>Categories</h2>
+      <div className={styles.categoryTabs}>
+        <button className={activeCategory === "generalKnowledge" ? styles.activeTab : styles.tab} onClick={() => setActiveCategory("generalKnowledge")}>
+          General Knowledge
+        </button>
+        <button className={activeCategory === "entertainment" ? styles.activeTab : styles.tab} onClick={() => setActiveCategory("entertainment")}>
+          Entertainment
+        </button>
+        <button className={activeCategory === "science" ? styles.activeTab : styles.tab} onClick={() => setActiveCategory("science")}>
+          Science
+        </button>
+      </div>
+      {activeCategory === "generalKnowledge" && (
         <div className={styles.categories}>
           <h3>General Knowledge</h3>
           <div className={styles.category}>
-            {Object.keys(categories.generalKnowledge).map((category) => (
+            {Object.entries(categories.generalKnowledge).map(([key, category]) => (
               <>
-                  <Link href={`/trivia/${category}`} className={styles.categoryInfo} key={category.categoryId}>
-                      <img src="https://picsum.photos/200" />
-                      <h4>{category.charAt(0).toUpperCase() + category.slice(1)}</h4>
-                      <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
+                  <Link href={`/trivia/${key}`} className={styles.categoryLink} key={category.categoryId}>
+                      <Image
+                        src={category.img}
+                        alt=""
+                        width={200}
+                        height={150}
+                        className={styles.categoryImg}
+                      />
+                      <div className={styles.categoryInfo}>
+                        <h4>{category.title}</h4>
+                        <p>{category.description}</p>
+                      </div>
                   </Link>
               </>
             ))}
             </div>
         </div>
+      )}
+      {activeCategory === "entertainment" && (
         <div className={styles.categories}>
           <h3>Entertainment</h3>
           <div className={styles.category}>
-            {Object.keys(categories.entertainment).map((category) => (
+            {Object.entries(categories.entertainment).map(([key, category]) => (
               <>
-                  <Link href={`/trivia/${category}`} className={styles.categoryInfo} key={category.categoryId}>
-                      <img src="https://picsum.photos/200"/>
-                      <h4>{category.charAt(0).toUpperCase() + category.slice(1)}</h4>
-                      <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
+                  <Link href={`/trivia/${key}`} className={styles.categoryLink} key={category.categoryId}>
+                      <Image
+                        src={category.img}
+                        alt=""
+                        width={200}
+                        height={150}
+                        className={styles.categoryImg}
+                      />
+                      <div className={styles.categoryInfo}>
+                        <h4>{category.title}</h4>
+                        <p>{category.description}</p>
+                      </div>
                   </Link>
             </>
             ))}
             </div>
         </div>
+      )}
+      {activeCategory === "science" && (
         <div className={styles.categories}>
           <h3>Science</h3>
           <div className={styles.category}>
-            {Object.keys(categories.science).map((category) => (
+            {Object.entries(categories.science).map(([key, category]) => (
               <>
-                  <Link href={`/trivia/${category}`} className={styles.categoryInfo} key={category.categoryId}>
-                      <img src="https://picsum.photos/200"/>
-                      <h4>{category.charAt(0).toUpperCase() + category.slice(1)}</h4>
-                      <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
+                  <Link href={`/trivia/${key}`} className={styles.categoryLink} key={category.categoryId}>
+                      <Image
+                        src={category.img}
+                        alt=""
+                        width={200}
+                        height={150}
+                        className={styles.categoryImg}
+                      />
+                      <div className={styles.categoryInfo}>
+                        <h4>{category.title}</h4>
+                        <p>{category.description}</p>
+                      </div>
                   </Link>
-            </>
+              </>
             ))}
             </div>
         </div>
+      )}
       </section>
       </main>
 
