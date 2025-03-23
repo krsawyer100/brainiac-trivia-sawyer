@@ -1,6 +1,7 @@
 import { withIronSessionApiRoute } from "iron-session/next";
 import sessionOptions from "../../../config/session"
 import db from '../../../db'
+import { use } from "react";
 
 export default withIronSessionApiRoute(
   function handler(req, res) {
@@ -40,13 +41,22 @@ async function logout(req, res) {
 }
 async function signup(req, res) {
   try {
-    const {username, password} = req.body
+    const {username, password, localScores} = req.body
     const {
       password: _,
       ...otherFields
     } = await db.user.create(username, password)
     req.session.user = otherFields
     await req.session.save()
+
+    if (localScores) {
+      const userId = otherFields._id
+      
+      for (const category in localScores) {
+        const score = localScores[category]
+        await db.score.addScore(userId, category, score)
+      }
+    }
     res.redirect('/')
   } catch(err) {
     res.status(400).json({error: err.message})

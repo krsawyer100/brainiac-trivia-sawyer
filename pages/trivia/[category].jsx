@@ -8,6 +8,7 @@ import { withIronSessionSsr } from "iron-session/next";
 import Header from "../../components/header";
 import Footer from "../../components/footer";
 import styles from "../../styles/Trivia.module.css";
+import Image from 'next/image'
 
 const API_URL = `https://opentdb.com/api.php?amount=10&type=multiple`
 
@@ -36,6 +37,101 @@ const categoryNums = {
     anime: 31,
     cartoons: 32 
 }
+
+const categoryMetadata = {
+    books: { 
+        title: "Books", 
+        icon: "/images/books-icon.png" 
+    },
+    film: { 
+        title: "Film", 
+        icon: "/images/film-icon.png" 
+    },
+    music: { 
+        title: "Music", 
+        icon: "/images/music-icon.png" 
+    },
+    musicals: { 
+        title: "Musicals", 
+        icon: "/images/musicals-icon.png" 
+    },
+    television: {
+        title: "Television", 
+        icon: "/images/television-icon.png" 
+    },
+    videogames: { 
+        title: "Video Games", 
+        icon: "/images/videogames-icon.png" 
+    },
+    boardgames: { 
+        title: "Board Games", 
+        icon: "/images/boardgames-icon.png" 
+    },
+    nature: { 
+        title: "Nature", 
+        icon: "/images/nature-icon.png" 
+    },
+    computers: { 
+        title: "Computers", 
+        icon: "/images/computers-icon.png" 
+    },
+    mathematics: { 
+        title: "Mathematics", 
+        icon: "/images/mathematics-icon.png" 
+    },
+    mythology: { 
+        title: "Mythology", 
+        icon: "/images/mythology-icon.png" 
+    },
+    sports: { 
+        title: "Sports", 
+        icon: "/images/sports-icon.png" 
+    },
+    geography: { 
+        title: "Geography", 
+        icon: "/images/geography-icon.png" 
+    },
+    history: { 
+        title: "History", 
+        icon: "/images/history-icon.png" 
+    },
+    politics: { 
+        title: "Politics", 
+        icon: "/images/politics-icon.png" 
+    },
+    art: { 
+        title: "Art", 
+        icon: "/images/art-icon.png" 
+    },
+    celebrities: { 
+        title: "Celebrities", 
+        icon: "/images/celebrities-icon.png" 
+    },
+    animals: { 
+        title: "Animals", 
+        icon: "/images/animals-icon.png" 
+    },
+    vehicles: { 
+        title: "Vehicles", 
+        icon: "/images/vehicles-icon.png" 
+    },
+    comics: { 
+        title: "Comics", 
+        icon: "/images/comics-icon.png" 
+    },
+    gadgets: { 
+        title: "Gadgets", 
+        icon: "/images/gadgets-icon.png" 
+    },
+    anime: { 
+        title: "Anime", 
+        icon: "/images/anime-icon.png" 
+    },
+    cartoons: { 
+        title: "Cartoons", 
+        icon: "/images/cartoons-icon.png" 
+    }
+  }
 
 export const getServerSideProps = withIronSessionSsr(
 async function getServerSideProps(context) {
@@ -87,6 +183,7 @@ export default function Trivia(props) {
     const [score, setScore] = useState(0)
     const [highScore, setHighScore] = useState(null)
     const [timeLeft, setTimeLeft] = useState(30)
+    const categoryInfo = categoryMetadata[category] || { title: category, icon: "❓" };
 
     function handleStartGame() {
         if (!gameRunning) {
@@ -99,6 +196,7 @@ export default function Trivia(props) {
 
     function handleAnswerSelection(choice) {
         const isCorrect = choice === questions[questionNum].correctAnswer
+
         if (isCorrect) {
             setScore((prev) => prev + 1)
         }
@@ -112,7 +210,13 @@ export default function Trivia(props) {
             if (isLoggedIn) {
                 addScore(category, finalScore, userId)
             } else {
-                console.log("user is not logged in")
+                const localScores = JSON.parse(localStorage.getItem("HighScores")) || {}
+                const prevScore = localScores[category]
+                if(!prevScore || finalScore > prevScore) {
+                    localScores[category] = finalScore
+                    localStorage.setItem("HighScores", JSON.stringify(localScores))
+                    setHighScore(finalScore)
+                }
             }
         }
     }
@@ -146,22 +250,29 @@ export default function Trivia(props) {
     }
 
     async function handleDeleteScore() {
-        try {
-            const res = await fetch("/api/score/removeScore", {
-                method: "DELETE",
-                headers: {
-                    "content-type": "application/json",
-                },
-                body: JSON.stringify({ category, userId }),
-            })
-            if (res.status === 200) {
-                setHighScore("--")
-                console.log('Score deleted successfully')
-            } else {
-                console.error('Error deleting score')
+        if (isLoggedIn) {
+            try {
+                const res = await fetch("/api/score/removeScore", {
+                    method: "DELETE",
+                    headers: {
+                        "content-type": "application/json",
+                    },
+                    body: JSON.stringify({ category, userId }),
+                })
+                if (res.status === 200) {
+                    setHighScore("--")
+                    console.log('Score deleted successfully')
+                } else {
+                    console.error('Error deleting score')
+                }
+            } catch (err) {
+                console.log(err.message)
             }
-        } catch (err) {
-            console.log(err.message)
+        } else {
+            const localScores = JSON.parse(localStorage.getItem("HighScores")) || {}
+            delete localScores[category]
+            localStorage.setItem("HighScores", JSON.stringify(localScores))
+            setHighScore("--")
         }
     }
 
@@ -169,6 +280,22 @@ export default function Trivia(props) {
         router.push('/')
     }
 
+    useEffect(() => {
+        if (!gameRunning) return
+        setTimeLeft(30)
+
+        const timer = setInterval(() => {
+            setTimeLeft((prev) => {
+                if (prev === 1) {
+                    clearInterval(timer);
+                    handleAnswerSelection(null);
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(timer)
+    }, [questionNum, gameRunning])
     useEffect(() => {
         if (isLoggedIn && userId) {
             async function fetchHighScore() {
@@ -185,6 +312,12 @@ export default function Trivia(props) {
                 }
             }
             fetchHighScore()
+        } else {
+            const localScores = JSON.parse(localStorage.getItem("HighScores")) || {}
+            const localHighScore = localScores[category]
+            if (localHighScore !== undefined) {
+                setHighScore(localHighScore)
+            }
         }
     }, [category, isLoggedIn, userId])
 
@@ -201,10 +334,21 @@ export default function Trivia(props) {
             {!gameRunning && questionNum === 0 && (
                 <>
                 <div className={styles.startGame}>
-                    <h2>Test your {category.charAt(0).toUpperCase() + category.slice(1)} Knowledge</h2>
-                    {!isLoggedIn && 
-                    <h4>Note: High scores are not saved if you are not logged in.</h4>
-                    }
+                    <div className={styles.gameInfo}>
+                        <Image
+                            src={categoryInfo.icon}
+                            alt=""
+                            width={60}
+                            height={60}
+                        />
+                        <h2>Test your {categoryInfo.title} Knowledge</h2>
+                        <Image
+                            src={categoryInfo.icon}
+                            alt=""
+                            width={60}
+                            height={60}
+                        />
+                    </div>
                     <button onClick={handleStartGame}>Start Game</button>
                 </div>
                 </>
@@ -212,6 +356,7 @@ export default function Trivia(props) {
             {gameRunning && (
                 <>
                 <div className={styles.gameContainer}>
+                    <p className={styles.timer}>Time Left: {timeLeft} secs</p>
                     <h3>{parse(questions[questionNum].question)}</h3>
                     <div className={styles.answersContainer}>
                         {questions[questionNum].answerChoices.map((choice, i) => (
@@ -236,12 +381,16 @@ export default function Trivia(props) {
                         <button onClick={handleExploreCategories}>Explore Other Categories</button>
                     </div>
                     <div className={styles.endGameHighScore}>
-                    {isLoggedIn &&
-                    <>
-                     <h3>Highscore: {highScore}%</h3>
-                     <button onClick={handleDeleteScore}>Delete Score</button>
-                     </>
-                     }
+                     <h3>Highscore: {highScore !== null ? `${highScore}%` : "--"}</h3>
+                     <button onClick={handleDeleteScore}>
+                        <Image
+                            src="/images/trash-icon.png"
+                            alt=""
+                            width={20}
+                            height={20}
+                        />
+                        <p>Delete Score</p>
+                    </button>
                 </div>
                 </div>
                 </>

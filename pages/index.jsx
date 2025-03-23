@@ -178,45 +178,64 @@ export default function Home(props) {
   const user = props.user
   const [scores, setScores] = useState([])
   const [activeCategory, setActiveCategory] = useState("generalKnowledge")
+  const [localScores, setLocalScores] = useState({})
 
   useEffect(() => {
-    async function fetchHighScores() {
-      try {
-        if (isLoggedIn && user) {
-          const userId = props.user._id
-          const res = await fetch(`/api/score/getAllScores?userId=${userId}`)
-          if (res.status === 200) {
-              const data = await res.json()
-              setScores(data)
-          } else {
-              console.log("error getting highscores")
-          }
-        }
-      } catch (err) {
-          console.log(err.message)
-      }
-    }
     fetchHighScores()
   }, [isLoggedIn, user, scores])
 
-  async function handleDeleteScore(e) {
-    const category = e.target.value
+  useEffect(() => {
+    if (!isLoggedIn) {
+      const savedScores = JSON.parse(localStorage.getItem("HighScores")) || {}
+      setLocalScores(savedScores)
+    }
+  }, [isLoggedIn])
+
+  async function fetchHighScores() {
     try {
+      if (isLoggedIn && user) {
         const userId = props.user._id
-        const res = await fetch("/api/score/removeScore", {
-            method: "DELETE",
-            headers: {
-                "content-type": "application/json",
-            },
-            body: JSON.stringify({ category, userId }),
-        })
+        const res = await fetch(`/api/score/getAllScores?userId=${userId}`)
         if (res.status === 200) {
-            console.log('Score deleted successfully')
+            const data = await res.json()
+            setScores(data)
         } else {
-            console.error('Error deleting score')
+            console.log("error getting highscores")
         }
+      }
     } catch (err) {
         console.log(err.message)
+    }
+  }
+
+  async function handleDeleteScore(e) {
+    const category = e.target.value
+    
+    if (isLoggedIn) {
+      try {
+          const userId = props.user._id
+          const res = await fetch("/api/score/removeScore", {
+              method: "DELETE",
+              headers: {
+                  "content-type": "application/json",
+              },
+              body: JSON.stringify({ category, userId }),
+          })
+          if (res.status === 200) {
+              console.log('Score deleted successfully')
+          } else {
+              console.error('Error deleting score')
+          }
+      } catch (err) {
+          console.log(err.message)
+      }
+    } else {
+      const localScores = JSON.parse(localStorage.getItem("HighScores")) || {}
+      if (category in localScores) {
+        delete localScores[category]
+        localStorage.setItem("HighScores", JSON.stringify(localScores))
+        setLocalScores(localScores)
+      }
     }
 }
 
@@ -250,7 +269,15 @@ export default function Home(props) {
                   <div key={score.category} className={styles.highScore}>
                     <h3>{score.category.charAt(0).toUpperCase() + score.category.slice(1)}</h3>
                     <h4>High Score: {score.highScore}</h4>
-                    <button onClick={handleDeleteScore} value={score.category}>Delete Score</button>
+                    <button onClick={handleDeleteScore} value={category}>
+                    <Image
+                      src='/images/trash-icon.png'
+                      alt=""
+                      width={20}
+                      height={20}
+                    />
+                    <p>Delete Score</p>
+                  </button>
                   </div>
                 </>
               ))
@@ -260,7 +287,34 @@ export default function Home(props) {
           </div>
         </section>
       )}
+      {!isLoggedIn && (
+        <section className={styles.highScores}>
+          <h2>Your High Scores</h2>
+          <div className={styles.highScoresContainer}>
+            {Object.keys(localScores).length > 0 ? (
+              Object.entries(localScores).map(([category, highScore]) => (
+                <div key={category} className={styles.highScore}>
+                  <h3>{category.charAt(0).toUpperCase() + category.slice(1)}</h3>
+                  <h4>High Score: {highScore}</h4>
+                  <button onClick={handleDeleteScore} value={category}>
+                    <Image
+                      src='/images/trash-icon.png'
+                      alt=""
+                      width={20}
+                      height={20}
+                    />
+                    <p>Delete Score</p>
+                  </button>
+                </div>
+              ))
+            ) : (
+              <h4 className={styles.noScores}>No High Scores Yet!</h4>
+            )}
+          </div>
+        </section>
+      )}
       <section className={styles.categoriesContainer}>
+      <h2>Trivia Categories</h2>
       <div className={styles.categoryTabs}>
         <button className={activeCategory === "generalKnowledge" ? styles.activeTab : styles.tab} onClick={() => setActiveCategory("generalKnowledge")}>
           General Knowledge
@@ -274,7 +328,6 @@ export default function Home(props) {
       </div>
       {activeCategory === "generalKnowledge" && (
         <div className={styles.categories}>
-          <h3>General Knowledge</h3>
           <div className={styles.category}>
             {Object.entries(categories.generalKnowledge).map(([key, category]) => (
               <>
@@ -287,7 +340,7 @@ export default function Home(props) {
                         className={styles.categoryImg}
                       />
                       <div className={styles.categoryInfo}>
-                        <h4>{category.title}</h4>
+                        <h3>{category.title}</h3>
                         <p>{category.description}</p>
                       </div>
                   </Link>
@@ -298,7 +351,6 @@ export default function Home(props) {
       )}
       {activeCategory === "entertainment" && (
         <div className={styles.categories}>
-          <h3>Entertainment</h3>
           <div className={styles.category}>
             {Object.entries(categories.entertainment).map(([key, category]) => (
               <>
@@ -311,7 +363,7 @@ export default function Home(props) {
                         className={styles.categoryImg}
                       />
                       <div className={styles.categoryInfo}>
-                        <h4>{category.title}</h4>
+                        <h3>{category.title}</h3>
                         <p>{category.description}</p>
                       </div>
                   </Link>
@@ -322,7 +374,6 @@ export default function Home(props) {
       )}
       {activeCategory === "science" && (
         <div className={styles.categories}>
-          <h3>Science</h3>
           <div className={styles.category}>
             {Object.entries(categories.science).map(([key, category]) => (
               <>
@@ -335,7 +386,7 @@ export default function Home(props) {
                         className={styles.categoryImg}
                       />
                       <div className={styles.categoryInfo}>
-                        <h4>{category.title}</h4>
+                        <h3>{category.title}</h3>
                         <p>{category.description}</p>
                       </div>
                   </Link>

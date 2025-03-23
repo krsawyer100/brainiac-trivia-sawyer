@@ -32,15 +32,20 @@ export default function Signup(props) {
     if (!username) return setError("Must include username");
     if (password !== confirmPassword) return setError("Passwords must Match");
 
+    const localScores = JSON.parse(localStorage.getItem("HighScores")) || {}
+
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
           "content-type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, localScores }),
       });
-      if (res.status === 200) return router.push("/");
+      if (res.status === 200) {
+        localStorage.removeItem("HighScores")
+        return router.push("/");
+      }
       const { error: message } = await res.json();
       setError(message);
     } catch (err) {
